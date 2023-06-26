@@ -1,6 +1,6 @@
 [build.environment]
   NPM_FLAGS = "--version"
-  NODE_VERSION = "17"
+  NODE_VERSION = "16"
   NODE_OPTIONS = "--max-old-space-size=4096"
 
 [build]
