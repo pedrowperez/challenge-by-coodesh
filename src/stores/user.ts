@@ -62,7 +62,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
-    error, loading, setNewSession, showMail, getSession, notifyNewEmail,
+    error, loading, setNewSession, showMail, getSession,
   }
 })
 

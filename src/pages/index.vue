@@ -2,18 +2,25 @@
 import { notification } from 'ant-design-vue'
 import { useNotifications } from 'vue-browser-notifications'
 
-const { requestPermission, sendNotification } = useNotifications(true)
+const { sendNotification } = useNotifications(true)
 
 const user = useUserStore()
-const loading = ref(true)
 const loadingInbox = ref(true)
 const email = ref('')
 let sessionContent = reactive([])
 const timerCount = reactive({ count: 20 })
 
+async function notifyNewEmail(mails: Array<string>, oldMails: Array<string>) {
+  if (oldMails) {
+    if (mails.length > oldMails.length) {
+      notification.success({ message: 'Novo e-mail!' })
+      sendNotification('Novo e-mail!', { body: 'E-mail novo na caixa de entrada!' })
+    }
+  }
+}
+
 async function setSession() {
   const sessionId = localStorage.getItem('mailSessionId')
-  loading.value = true
   loadingInbox.value = true
 
   if (!sessionId) {
@@ -37,7 +44,6 @@ async function setSession() {
       loadingInbox.value = false
     }
   }
-  loading.value = false
 }
 
 watchEffect(() => {
@@ -49,15 +55,6 @@ watchEffect(() => {
     }, 1000)
   }
 })
-
-async function notifyNewEmail(mails: Array<string>, oldMails: Array<string>) {
-  if (oldMails) {
-    if (mails.length > oldMails.length) {
-      notification.success({ message: 'Novo e-mail!' })
-      sendNotification('Novo e-mail!', { body: 'E-mail novo na caixa de entrada!' })
-    }
-  }
-}
 
 onMounted(() => {
   setSession()
