@@ -5,12 +5,10 @@
   "scripts": {
     "build": "vite-ssg build",
     "dev": "vite --port 3333 --open",
-    "lint": "eslint .",
     "preview": "vite preview",
     "preview-https": "serve dist",
     "test": "vitest",
-    "test:e2e": "cypress open",
-    "test:unit": "vitest"
+    "test:e2e": "cypress open"
   },
   "dependencies": {
     "@unhead/vue": "^1.1.27",
