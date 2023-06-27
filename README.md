@@ -35,10 +35,14 @@ Uma boa maneira de lidar com isso é usar um endereço de e-mail temporário se 
 - ☁️ Deploy on Netlify, zero-config
 
 ## Modo de uso
-
-### Desenvolvimento
+### Instalação
 
 Apenas acesse http://localhost:3333
+
+```bash
+pnpm i
+```
+### Desenvolvimento
 
 ```bash
 pnpm dev
