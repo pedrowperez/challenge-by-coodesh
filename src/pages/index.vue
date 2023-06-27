@@ -7,8 +7,9 @@ const { sendNotification } = useNotifications(true)
 const user = useUserStore()
 const loadingInbox = ref(true)
 const email = ref('')
-let sessionContent = reactive([])
+let oldSession = reactive([])
 const timerCount = reactive({ count: 20 })
+const sessionId = localStorage.getItem('mailSessionId')
 
 async function notifyNewEmail(mails: Array<string>, oldMails: Array<string>) {
   if (oldMails) {
@@ -19,8 +20,24 @@ async function notifyNewEmail(mails: Array<string>, oldMails: Array<string>) {
   }
 }
 
+async function getSession(id?: any) {
+  loadingInbox.value = true
+  const key = id || sessionId
+  const activeSession: any = await user.getSession(key)
+  const newSession = activeSession.sessionIncoming?.data?.session
+  if (newSession) {
+    await notifyNewEmail(newSession?.mails, oldSession)
+    oldSession = newSession?.mails
+    email.value = newSession?.addresses[0].address
+    timerCount.count = 20
+    notification.success({ message: 'Atualizado com sucesso!' })
+    loadingInbox.value = false
+  }
+
+  loadingInbox.value = false
+}
+
 async function setSession() {
-  const sessionId = localStorage.getItem('mailSessionId')
   loadingInbox.value = true
 
   if (!sessionId) {
@@ -35,20 +52,14 @@ async function setSession() {
     email.value = getEmail
   }
   else {
-    const activeSession: any = await user.getSession(sessionId)
-    if (activeSession.sessionIncoming?.data?.session) {
-      await notifyNewEmail(activeSession.sessionIncoming?.data?.session?.mails, sessionContent)
-      sessionContent = activeSession.sessionIncoming?.data?.session?.mails
-      email.value = activeSession.sessionIncoming?.data?.session?.addresses[0].address
-      timerCount.count = 20
-      loadingInbox.value = false
-    }
+    await getSession(sessionId)
+    loadingInbox.value = false
   }
 }
 
 watchEffect(() => {
   if (timerCount.count === 0)
-    setSession()
+    getSession()
   if (timerCount.count > 0) {
     setTimeout(() => {
       timerCount.count--
@@ -65,12 +76,12 @@ onMounted(() => {
   <div class="px-10 lg:px-25">
     <div>
       <SharedInput v-model="email" />
-      <button class="my-4 w-full flex items-center justify-center" @click="setSession()">
+      <button class="my-4 w-full flex items-center justify-center" @click="getSession()">
         Autorefresh in {{ timerCount.count }}
         <undo-outlined spin class="pl-2" />
       </button>
       <DefaultLoad v-if="loadingInbox" />
-      <Inbox v-else-if="!loadingInbox && sessionContent" :session="sessionContent" />
+      <Inbox v-else-if="!loadingInbox && oldSession" :session="oldSession" />
     </div>
   </div>
 </template>
