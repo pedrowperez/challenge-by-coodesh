@@ -8,10 +8,9 @@ export const useUserStore = defineStore('user', () => {
 
   async function showMail(result: any) {
     const idSession = result.data?.introduceSession?.id
-    localStorage.setItem('mailSessionId', idSession)
     const mail = await getSession(idSession)
     return idSession
-      ? { type: 'success', message: 'Tudo certo!', description: 'E-mail gerado com sucesso!', getEmail: result.data.introduceSession.addresses[0].address, mail }
+      ? { type: 'success', message: 'Tudo certo!', description: 'E-mail gerado com sucesso!', getEmail: result.data.introduceSession.addresses[0].address, mail, id: idSession }
       : { type: 'error', message: 'Ooops!', description: 'Algo deu errado, tente novamente mais tarde!' }
   }
 
@@ -25,6 +24,10 @@ export const useUserStore = defineStore('user', () => {
       const newSession = await fetch(baseApi, requestOptions)
         .then(response => response.json())
         .then(response => showMail(response))
+
+      const idSession = newSession.id
+      localStorage.setItem('mailSessionId', idSession)
+
       return {
         newSession,
       }
